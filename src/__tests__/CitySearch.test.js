@@ -26,3 +26,12 @@ test('change state when text input changes', () => {
     CitySearchWrapper.find('.city').simulate('change', eventObject);
     expect(CitySearchWrapper.state('query')).toBe('Berlin');
 });
+
+test('render list of suggestions correctly', () => {
+    const CitySearchWrapper = shallow(<CitySearch />);
+    const suggestions = CitySearchWrapper.state('suggestions');
+    expect(CitySearchWrapper.find('.suggestions li')).toHaveLength(suggestions.length);
+    for (let i = 0; i < suggestions.length; i += 1) {
+        expect(CitySearchWrapper.find('.suggestions li').at(i).text()).toBe(suggestions[i].name_string);
+    }
+});
