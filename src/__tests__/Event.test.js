@@ -7,4 +7,8 @@ describe('<App /> component', () => {
     beforeAll(() => {
         EventWrapper = shallow(<Event />);
     });
+
+    test('render event', () => {
+        expect(EventWrapper.find('.event')).toHaveLength(1);
+    });
 });
