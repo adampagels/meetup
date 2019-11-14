@@ -22,4 +22,8 @@ describe('<NumberOfEvents /> component', () => {
         NumberOfEventsWrapper.find('#event-number').simulate('change', eventObject);
         expect(NumberOfEventsWrapper.state('numberOfEvents')).toBe(32);
     });
+
+    test('render input label', () => {
+        expect(NumberOfEventsWrapper.find('.number-of-events label')).toHaveLength(1);
+    });
 });
