@@ -34,4 +34,12 @@ describe('<App /> component', () => {
     test('render hide/show details button', () => {
         expect(EventWrapper.find('.open-event-button')).toHaveLength(1);
     });
+
+    test('click on button should show details', () => {
+        EventWrapper.setState({
+            showDetails: false
+        });
+        EventWrapper.find('.open-event-button').simulate('click');
+        expect(EventWrapper.state('showDetails')).toBe(true);
+    });
 });
