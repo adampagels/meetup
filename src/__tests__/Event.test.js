@@ -15,4 +15,8 @@ describe('<App /> component', () => {
     test('render event info', () => {
         expect(EventWrapper.find('.event-info')).toHaveLength(1);
     });
+
+    test('render event-name', () => {
+        expect(EventWrapper.find('.event-name')).toHaveLength(1);
+    });
 });
