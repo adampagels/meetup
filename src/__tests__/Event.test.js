@@ -30,4 +30,8 @@ describe('<App /> component', () => {
         });
         expect(EventWrapper.find('.event-info')).toHaveLength(1);
     });
+
+    test('render hide/show details button', () => {
+        expect(EventWrapper.find('.open-event-button')).toHaveLength(1);
+    });
 });
