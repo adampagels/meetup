@@ -8,7 +8,12 @@ describe('<NumberOfEvents /> component', () => {
         NumberOfEventsWrapper = shallow(<NumberOfEvents />);
     });
 
-    test('render input field', () => {
+    test('render input container', () => {
         expect(NumberOfEventsWrapper.find('.number-of-events')).toHaveLength(1);
+    });
+
+    test('render input field', () => {
+        const numberOfEvents = NumberOfEventsWrapper.state('numberOfEvents');
+        expect(NumberOfEventsWrapper.find('#event-number').prop('value')).toBe(numberOfEvents);
     });
 });
