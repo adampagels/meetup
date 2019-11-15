@@ -4,7 +4,7 @@ import CitySearch from '../CitySearch';
 
 let CitySearchWrapper;
 beforeAll(() => {
-    CitySearchWrapper = shallow(<CitySearch />);
+    CitySearchWrapper = shallow(<CitySearch updateEvents={() => { }} />);
 });
 
 describe('<CitySearch /> component', () => {
