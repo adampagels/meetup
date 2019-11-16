@@ -1,58 +1,6 @@
 import axios from 'axios';
 import { mockEvents } from './mock-events';
 
-async function getOrRenewAccessToken(type, key) {
-    let url;
-    if (type === 'get') {
-        // Lambda endpoint to get token by code
-        url = 'https://v60ixg8mo0.execute-api.eu-central-1.amazonaws.com/dev/api/token/'
-            + key;
-    } else if (type === 'renew') {
-        // Lambda endpoint to get token by refresh_token
-        url = 'https://v60ixg8mo0.execute-api.eu-central-1.amazonaws.com/dev/api/refresh/'
-            + key;
-    }
-
-    // Use axios to do GET request to the endpoint
-    const tokenInfo = await axios.get(url);
-    // Save tokens to localStorage together with a timestamp
-    localStorage.setItem('access_token', tokenInfo.data.access_token);
-    localStorage.setItem('refresh_token', tokenInfo.data.refresh_token);
-    localStorage.setItem('last_saved_time', Date.now());
-    // Return the access_token
-    return tokenInfo.data.access_token;
-}
-
-async function getAccessToken() {
-    const accessToken = localStorage.getItem('access_token');
-
-    // If no access_token found
-    if (!accessToken) {
-        // We try to get the authorization code from the url
-        const searchParams = new URLSearchParams(window.location.search);
-        const code = searchParams.get('code');
-
-        if (!code) {
-            // If we don't find any code, we need to redirect user to get it
-            window.location.href = 'https://secure.meetup.com/oauth2/authorize?client_id=mm5di1ohpapnqh69n1gu6mp52m&response_type=code&redirect_uri=https://adampagels.github.io/meetup/';
-            return null;
-        }
-        return getOrRenewAccessToken('get', code);
-    }
-
-    const lastSavedTime = localStorage.getItem('last_saved_time');
-
-    // Check if access_token is still valid
-    // Date.now() returns timestamp in milliseconds, one hour = 3600000 milliseconds
-    if (accessToken && (Date.now() - lastSavedTime < 3600000)) {
-        // The token is valid, return the token and end the function
-        return accessToken;
-    }
-    // If the access_token is expired, we try to renew it by using refresh_token
-    const refreshToken = localStorage.getItem('refresh_token');
-    return getOrRenewAccessToken('renew', refreshToken);
-}
-
 async function getSuggestions(query) {
     if (window.location.href.startsWith('http://localhost')) {
         return [
@@ -79,6 +27,7 @@ async function getSuggestions(query) {
     }
 
     const token = await getAccessToken();
+
     if (token) {
         const url = 'https://api.meetup.com/find/locations?&sign=true&photo-host=public&query='
             + query
@@ -86,27 +35,93 @@ async function getSuggestions(query) {
         const result = await axios.get(url);
         return result.data;
     }
-    return [];
-}
 
-async function getEvents(lat, lon) {
+    return [];
+};
+
+async function getEvents(lat, lon, page) {
     if (window.location.href.startsWith('http://localhost')) {
         return mockEvents.events;
     }
 
+    if (!navigator.onLine) {
+        const events = localStorage.getItem('lastEvents');
+        return JSON.parse(events);
+    }
+
     const token = await getAccessToken();
+
     if (token) {
         let url = 'https://api.meetup.com/find/upcoming_events?&sign=true&photo-host=public'
             + '&access_token=' + token;
-        // lat, lon is optional, if we have lat and lon, then we can add them
+        // lat, lon is optional; if you have a lat and lon, you can add them
         if (lat && lon) {
             url += '&lat=' + lat + '&lon=' + lon;
         }
+        if (page) {
+            url += '&page=' + page;
+        }
+        if (lat && lon && page) {
+            url += '&lat=' + lat + '&lon=' + lon + '&page=' + page;
+        }
         const result = await axios.get(url);
-        return result.data.events;
+        const events = result.data.events;
+        if (events.length) {
+            localStorage.setItem('lastEvents', JSON.stringify(events));
+        }
+        return events;
     }
-    return [];
-}
 
-export { getSuggestions, getEvents };
+};
 
+function getAccessToken() {
+    const accessToken = localStorage.getItem('access_token');
+
+    if (!accessToken) {
+        const searchParams = new URLSearchParams(window.location.search);
+        const code = searchParams.get('code');
+
+        if (!code) {
+            window.location.href = 'https://secure.meetup.com/oauth2/authorize?client_id=mm5di1ohpapnqh69n1gu6mp52m&response_type=code&redirect_uri=https://guennithegun.github.io/meetup/';
+            return null;
+        }
+
+        return getOrRenewAccessToken('get', code);
+    }
+
+    const lastSavedTime = localStorage.getItem('last_saved_time');
+
+    if (accessToken && (Date.now() - lastSavedTime < 3600000)) {
+        return accessToken
+    }
+
+    const refreshToken = localStorage.getItem('refresh_token');
+
+    return getOrRenewAccessToken('renew', refreshToken);
+};
+
+async function getOrRenewAccessToken(type, key) {
+    let url;
+    if (type === 'get') {
+        // Lambda endpoint to get token by code
+        url = 'https://v60ixg8mo0.execute-api.eu-central-1.amazonaws.com/dev/api/token/'
+            + key;
+    } else if (type === 'renew') {
+        // Lambda endpoint to get token by refresh_token
+        url = 'https://v60ixg8mo0.execute-api.eu-central-1.amazonaws.com/dev/api/refresh/'
+            + key;
+    }
+
+    // Use Axios to make a GET request to the endpoint
+    const tokenInfo = await axios.get(url);
+
+    // Save tokens to localStorage together with a timestamp
+    localStorage.setItem('access_token', tokenInfo.data.access_token);
+    localStorage.setItem('refresh_token', tokenInfo.data.refresh_token);
+    localStorage.setItem('last_saved_time', Date.now());
+
+    // Return the access_token
+    return tokenInfo.data.access_token;
+};
+
+export { getSuggestions, getEvents, getAccessToken };
