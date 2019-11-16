@@ -2,27 +2,40 @@ import React, { Component } from 'react';
 
 class Event extends Component {
     state = {
-        showDetails: false,
-        event: {}
+        expanded: false,
     }
 
-    handleShowDetails = () => {
-        this.setState({ showDetails: true });
+    onDetailsButtonClicked = () => {
+        this.setState(prevState => ({
+            expanded: !prevState.expanded
+        }));
     }
+
     render() {
-        const showDetails = this.state.showDetails;
+        const event = this.props.event;
         return (
-            <div className="event">
-                <div className="event-overview">
-                    <div className="event-name">{this.props.event.name}</div>
-                    <div className="event-date">{this.props.event.local_date}</div>
-                    <button class onClick={() => this.handleShowDetails()}>Show Details</button>
-                </div>
-                {showDetails &&
-                    <div className="event-info">
-                        <div className="event-details">{this.props.event.description}</div>
+            <div className="Event">
+                <p className="time">{event.local_time} - {event.local_date}</p>
+                <p className="name">{event.name}</p>
+                {event.group && event.group.name && <p className="group-name">Group: {event.group.name}</p>}
+                <p className="going">{event.yes_rsvp_count} people are going</p>
+                {this.state.expanded &&
+                    <div className="extra">
+                        {event.venue && event.venue.name &&
+                            <p className="address">
+                                {event.venue.name
+                                    + ', ' + event.venue.address_1
+                                    + ', ' + event.venue.city
+                                    + ', ' + event.venue.localized_country_name
+                                }
+                            </p>
+                        }
+                        <div className="description" dangerouslySetInnerHTML={{ __html: event.description }} />
+                        <p className="visibility">{event.visibility}</p>
+                        <a className="link" href={event.link}>Event Link</a>
                     </div>
                 }
+                <button className="details-btn" onClick={this.onDetailsButtonClicked}>Details</button>
             </div>
         );
     }
