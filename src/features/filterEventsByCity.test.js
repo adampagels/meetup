@@ -1,4 +1,9 @@
+import React from 'react';
+
+import { mount } from 'enzyme';
+import App from '../App';
 import { loadFeature, defineFeature } from 'jest-cucumber';
+import { mockEvents } from '../mock-events';
 
 const feature = loadFeature('./src/features/filterEventsByCity.feature');
 
@@ -8,12 +13,14 @@ defineFeature(feature, test => {
 
         });
 
+        let AppWrapper;
         when('the user opens the app', () => {
-
+            AppWrapper = mount(<App />);
         });
 
         then('the user should see the list of upcoming events from their location', () => {
-
+            AppWrapper.update();
+            expect(AppWrapper.find('.Event')).toHaveLength(mockEvents.events.length);
         });
     });
 
