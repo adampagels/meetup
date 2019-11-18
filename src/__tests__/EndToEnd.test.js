@@ -1,35 +1,38 @@
 import puppeteer from 'puppeteer';
 
-describe('puppeteer tests', () => {
-    beforeEach(() => {
-        jest.setTimeout(10000000);
+describe('show/hide an event details', () => {
+    jest.setTimeout(10000000);
+    let browser;
+    let page;
+    beforeAll(async () => {
+        browser = await puppeteer.launch();
+        page = await browser.newPage();
+        await page.goto('http://localhost:3000/');
+        await page.waitForSelector('.Event');
     });
-    describe('show/hide an event details', () => {
-        test('An event element is collapsed by default', async () => {
-            const browser = await puppeteer.launch({
-                headless: false,
-                slowMo: 500 // slow down by 250ms
-            });
-            const page = await browser.newPage();
-            await page.goto('http://localhost:3000/');
 
-            await page.waitForSelector('.Event');
+    afterAll(() => {
+        browser.close();
+    });
 
-            const extra = await page.$('.Event .extra');
-            expect(extra).toBeNull();
-            browser.close();
-        });
-        test('User can expand an event to see its details', async () => {
-            const browser = await puppeteer.launch();
-            const page = await browser.newPage();
-            await page.goto('http://localhost:3000/');
+    test('An event element is collapsed by default', async () => {
+        jest.setTimeout(10000000);
+        const extra = await page.$('.Event .extra');
+        expect(extra).toBeNull();
+    });
 
-            await page.waitForSelector('.Event');
-            await page.click('.Event .details-btn');
+    test('User can expand an event to see its details', async () => {
+        jest.setTimeout(10000000);
+        await page.click('.Event .details-btn');
 
-            const extra = await page.$('.Event .extra');
-            expect(extra).toBeDefined();
-            browser.close();
-        });
+        const extra = await page.$('.Event .extra');
+        expect(extra).toBeDefined();
+    });
+    test('User can collapse an event to hide its details', async () => {
+        jest.setTimeout(10000000);
+        await page.click('.Event .details-btn');
+
+        const extra = await page.$('.Event .extra');
+        expect(extra).toBeNull();
     });
 });
