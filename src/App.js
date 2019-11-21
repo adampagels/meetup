@@ -5,6 +5,7 @@ import EventList from './EventList';
 import CitySearch from './CitySearch';
 import NumberOfEvents from './NumberOfEvents';
 import { getEvents } from './api';
+import { WarningAlert } from './Alert';
 
 class App extends Component {
   componentDidMount() {
@@ -16,9 +17,15 @@ class App extends Component {
     page: null,
     lat: null,
     lon: null,
+    warningText: ''
   }
 
   updateEvents = (lat, lon, page) => {
+    if (!navigator.onLine) {
+      this.setState({ warningText: 'You are not connected to the internet! The list of events is loaded from the last session.' });
+    } else {
+      this.setState({ warningText: '' })
+    }
     if (lat && lon) {
       getEvents(lat, lon, this.state.page).then(response =>
         this.setState({ events: response, lat, lon }));
@@ -38,6 +45,7 @@ class App extends Component {
     return (
       <div className="App">
         <CitySearch updateEvents={this.updateEvents} />
+        <WarningAlert text={this.state.warningText} />
         <NumberOfEvents
           updateEvents={this.updateEvents}
           numberOfEvents={this.state.events.length}
