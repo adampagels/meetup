@@ -82,7 +82,7 @@ function getAccessToken() {
         const code = searchParams.get('code');
 
         if (!code) {
-            window.location.href = 'https://secure.meetup.com/oauth2/authorize?client_id=mm5di1ohpapnqh69n1gu6mp52m&response_type=code&redirect_uri=https://guennithegun.github.io/meetup/';
+            window.location.href = 'https://secure.meetup.com/oauth2/authorize?client_id=mm5di1ohpapnqh69n1gu6mp52m&response_type=code&redirect_uri=https://adampagels.github.io/meetup/';
             return null;
         }
 
