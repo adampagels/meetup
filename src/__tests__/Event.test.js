@@ -1,46 +1,43 @@
 import React from 'react';
+
 import { shallow } from 'enzyme';
 import Event from '../Event';
 
-describe('<App /> component', () => {
+describe('<Event /> component', () => {
     let EventWrapper;
     beforeAll(() => {
         EventWrapper = shallow(<Event />);
     });
 
-    test('render event', () => {
-        expect(EventWrapper.find('.event')).toHaveLength(1);
+    test('render Event', () => {
+        expect(EventWrapper.find('.Event')).toHaveLength(1);
     });
 
-    test('render event-overview', () => {
-        expect(EventWrapper.find('.event-overview')).toHaveLength(1);
+    test('render event name', () => {
+        expect(EventWrapper.find('.name')).toHaveLength(1);
     });
 
-    test('render event-name', () => {
-        expect(EventWrapper.find('.event-name')).toHaveLength(1);
+    test('render children of Event', () => {
+        expect(EventWrapper.find('.Event').children()).toHaveLength(3);
     });
 
-    test('render children of event-overview', () => {
-        expect(EventWrapper.find('.event-overview').children()).toHaveLength(3);
-    });
-
-    test('render children of event-info ', () => {
+    test('render children of event info ', () => {
         EventWrapper.setState({
-            showDetails: true
+            expanded: true
         });
-        expect(EventWrapper.find('.event-info')).toHaveLength(1);
+        expect(EventWrapper.find('.extra')).toHaveLength(1);
     });
 
     test('render hide/show details button', () => {
-        expect(EventWrapper.find('.event-overview button')).toHaveLength(1);
+        expect(EventWrapper.find('.details-btn')).toHaveLength(1);
     });
 
     test('click on button should show details', () => {
         EventWrapper.setState({
-            showDetails: false
+            expanded: false
         });
-        EventWrapper.find('.event-overview button').simulate('click');
-        expect(EventWrapper.state('showDetails')).toBe(true);
+        EventWrapper.find('.details-btn').simulate('click');
+        expect(EventWrapper.state('expanded')).toBe(true);
     });
 
     test('render mock data as event state', () => {
