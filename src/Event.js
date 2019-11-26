@@ -28,7 +28,23 @@ class Event extends Component {
                 <p className="time">{event.local_time} - {event.local_date}</p>
                 <p className="name">{event.name}</p>
                 {event.group && event.group.name && <p className="group-name">Group: {event.group.name}</p>}
-                <p className="going">{event.yes_rsvp_count} people are going</p>
+                {event.yes_rsvp_count > 1 ?
+                    <p className="going">{event.yes_rsvp_count} people are going</p> :
+                    <p className="going">{event.yes_rsvp_count} person is going</p>
+                }
+                {event.rsvp_limit &&
+                    <ResponsiveContainer height={150} width={250}>
+                        <PieChart>
+                            <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={32} label>
+                                {
+                                    data.map((entry, index) => (<Cell key={`cell-${index}`} fill={colors[index]} />))
+                                }
+                            </Pie>
+                            <Legend iconSize={10} iconType="circle" layout="horizontal" verticalAlign="bottom" align="center" />
+                            <Tooltip />
+                        </PieChart>
+                    </ResponsiveContainer>
+                }
                 {this.state.expanded &&
                     <div className="extra">
                         {event.venue && event.venue.name &&
@@ -43,17 +59,6 @@ class Event extends Component {
                         <div className="description" dangerouslySetInnerHTML={{ __html: event.description }} />
                         <p className="visibility">{event.visibility}</p>
                         <a className="link" href={event.link}>Event Link</a>
-                        <ResponsiveContainer height={150} width={250}>
-                            <PieChart>
-                                <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={32} label >
-                                    {
-                                        data.map((entry, index) => (<Cell key={`cell-${index}`} fill={colors[index]} />))
-                                    }
-                                </Pie>
-                                <Legend iconSize={10} iconType="circle" layout="horizontal" verticalAlign="bottom" align="center" />
-                                <Tooltip />
-                            </PieChart>
-                        </ResponsiveContainer>
                     </div>
                 }
                 <button className="details-btn" onClick={this.onDetailsButtonClicked}>Details</button>
